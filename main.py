@@ -7,20 +7,15 @@ def process(image):
     threshold_high = 200
     image_canny = cv2.Canny(image_g, threshold_low, threshold_high)
 
-    # Define your vertices array (ROI)
     vertices = np.array([[(335,image.shape[0]), (870,image.shape[0]), (685,530), (550, 530)]], dtype=np.int32)
-
-    # Draw the ROI on the original image before processing
-    # cv2.polylines(image, vertices, isClosed=True, color=(0,0,255), thickness=5)
-
     cropped_image = region_of_interest(image_canny, vertices)
     rho = 2
     theta = np.pi/180
-    threshold = 10
-    min_line_len = 30
+    threshold = 50
+    min_line_len = 35
     max_line_gap = 30
     lines = cv2.HoughLinesP(cropped_image, rho, theta, threshold, np.array([]), minLineLength=min_line_len, maxLineGap=max_line_gap)
-    line_image = draw_the_lines(image, lines) 
+    line_image = draw_the_lines(image, lines, vertices)  # Updated to pass vertices
     return line_image
 
 def region_of_interest(img, vertices):
@@ -29,30 +24,50 @@ def region_of_interest(img, vertices):
     masked_image = cv2.bitwise_and(img, mask)
     return masked_image
 
-def draw_the_lines(img, lines):
-    if lines is not None:
-        img = np.copy(img)
-        line_image = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-        for line in lines:
-            for x1, y1, x2, y2 in line:
-                # Calculate line length and slope
-                length = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-                slope = (y2 - y1) / (x2 - x1 + 1e-6)  # Add a small epsilon to avoid division by zero
+def draw_the_lines(img, lines, vertices):
+    left_lines = []  # Lines on the left side
+    right_lines = []  # Lines on the right side
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            # Calculate the slope; avoid division by zero
+            if (x2 - x1) == 0:  # This would be a vertical line
+                continue  # Proceed with vertical lines, since we're ignoring horizontal ones
+            slope = (y2 - y1) / (x2 - x1)
+            # Filter out horizontal lines based on slope threshold
+            if abs(slope) < 0.5:  # Adjust this threshold to ignore lines that are too horizontal
+                continue  # This excludes nearly horizontal lines
+            if slope < 0:
+                left_lines.append((slope, y1 - slope * x1))
+            else:
+                right_lines.append((slope, y1 - slope * x1))
 
-                # Adjust thickness based on line length and slope
-                thickness = int(np.clip(length / 50 + abs(slope) * 5, 1, 10))  # Adjust the constants as needed
+    if left_lines:
+        left_avg = np.average(left_lines, axis=0)
+        x1, y1, x2, y2 = calculate_coordinates(img.shape, left_avg, vertices)
+        cv2.line(img, (x1, y1), (x2, y2), (255, 0, 0), 10)
 
-                cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), thickness)
-        img = cv2.addWeighted(img, 1, line_image, 1, 0)
+    if right_lines:
+        right_avg = np.average(right_lines, axis=0)
+        x1, y1, x2, y2 = calculate_coordinates(img.shape, right_avg, vertices)
+        cv2.line(img, (x1, y1), (x2, y2), (255, 0, 0), 10)
+
     return img
 
+
+def calculate_coordinates(shape, line_parameters, vertices):
+    slope, intercept = line_parameters
+    y1 = max(vertices[0][0][1], vertices[0][1][1])  # The higher (y-value) of the bottom vertices
+    y2 = min(vertices[0][2][1], vertices[0][3][1])  # The lower (y-value) of the top vertices
+    x1 = int((y1 - intercept) / slope)
+    x2 = int((y2 - intercept) / slope)
+    return x1, y1, x2, y2
 
 cap = cv2.VideoCapture('./3.mp4')
 frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
 size = (frame_width, frame_height)
 
-result = cv2.VideoWriter('./res_with_roi.mp4', 
+result = cv2.VideoWriter('./result.mp4', 
                          cv2.VideoWriter_fourcc(*'mp4v'), 
                          20, size)
 
