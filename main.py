@@ -1,53 +1,69 @@
-import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+import cv2
+
+def process(image):
+    image_g = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    threshold_low = 50
+    threshold_high = 200
+    image_canny = cv2.Canny(image_g, threshold_low, threshold_high)
+
+    # Define your vertices array (ROI)
+    vertices = np.array([[(335,image.shape[0]), (870,image.shape[0]), (685,530), (550, 530)]], dtype=np.int32)
+
+    # Draw the ROI on the original image before processing
+    # cv2.polylines(image, vertices, isClosed=True, color=(0,0,255), thickness=5)
+
+    cropped_image = region_of_interest(image_canny, vertices)
+    rho = 2
+    theta = np.pi/180
+    threshold = 10
+    min_line_len = 30
+    max_line_gap = 30
+    lines = cv2.HoughLinesP(cropped_image, rho, theta, threshold, np.array([]), minLineLength=min_line_len, maxLineGap=max_line_gap)
+    line_image = draw_the_lines(image, lines) 
+    return line_image
 
 def region_of_interest(img, vertices):
     mask = np.zeros_like(img)
     cv2.fillPoly(mask, vertices, 255)
-    masked_img = cv2.bitwise_and(img, mask)
-    return masked_img
+    masked_image = cv2.bitwise_and(img, mask)
+    return masked_image
 
-def draw_lines(img, lines):
-    line_img = np.zeros_like(img)
+def draw_the_lines(img, lines):
     if lines is not None:
+        img = np.copy(img)
+        line_image = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
         for line in lines:
             for x1, y1, x2, y2 in line:
-                cv2.line(line_img, (x1, y1), (x2, y2), (255, 0, 0), 10)
-    img = cv2.addWeighted(img, 0.8, line_img, 1, 0)
+                # Calculate line length and slope
+                length = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+                slope = (y2 - y1) / (x2 - x1 + 1e-6)  # Add a small epsilon to avoid division by zero
+
+                # Adjust thickness based on line length and slope
+                thickness = int(np.clip(length / 50 + abs(slope) * 5, 1, 10))  # Adjust the constants as needed
+
+                cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), thickness)
+        img = cv2.addWeighted(img, 1, line_image, 1, 0)
     return img
 
-# Load the image
-image = cv2.imread('22.jpg')
-image_copy = np.copy(image)
 
-# Convert to grayscale
-gray = cv2.cvtColor(image_copy, cv2.COLOR_BGR2GRAY)
+cap = cv2.VideoCapture('./3.mp4')
+frame_width = int(cap.get(3))
+frame_height = int(cap.get(4))
+size = (frame_width, frame_height)
 
-# Apply Gaussian blur
-blur = cv2.GaussianBlur(gray, (5, 3), 0)
+result = cv2.VideoWriter('./res_with_roi.mp4', 
+                         cv2.VideoWriter_fourcc(*'mp4v'), 
+                         20, size)
 
-# Canny edge detection
-edges = cv2.Canny(blur, 50, 150)
+while cap.isOpened():
+    ret, frame = cap.read()
+    if ret:
+        frame_with_roi = process(frame)
+        result.write(frame_with_roi)
+    else:
+        break
 
-# Define the region of interest centered and covering half the height
-imshape = image.shape
-bottom_left = (imshape[1] * 0.3, imshape[0])  # 10% from the left of the screen to the bottom
-top_left = (imshape[1] * 0.3, imshape[0] * 0.4)  # 40% from the left, halfway up
-top_right = (imshape[1] * 0.3, imshape[0] * 0.4)  # 60% from the left, halfway up
-bottom_right = (imshape[1] * 0.9, imshape[0])  # 90% from the left to the bottom
-vertices = np.array([[bottom_left, top_left, top_right, bottom_right]], dtype=np.int32)
-
-masked_edges = region_of_interest(edges, vertices)
-
-# Hough transform for line detection
-lines = cv2.HoughLinesP(masked_edges, 2, np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap=150)
-
-# Draw the lines on the original image
-lines_detected = draw_lines(image_copy, lines)
-
-# Display the result
-plt.figure(figsize=(10,10))
-plt.imshow(cv2.cvtColor(lines_detected, cv2.COLOR_BGR2RGB))
-plt.axis('off')
-plt.show()
+cap.release()
+result.release()
+cv2.destroyAllWindows()
