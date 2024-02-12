@@ -24,34 +24,39 @@ def region_of_interest(img, vertices):
     masked_image = cv2.bitwise_and(img, mask)
     return masked_image
 
+
 def draw_the_lines(img, lines, vertices):
     left_lines = []  # Lines on the left side
     right_lines = []  # Lines on the right side
     for line in lines:
         for x1, y1, x2, y2 in line:
-            # Calculate the slope; avoid division by zero
-            if (x2 - x1) == 0:  # This would be a vertical line
-                continue  # Proceed with vertical lines, since we're ignoring horizontal ones
-            slope = (y2 - y1) / (x2 - x1)
-            # Filter out horizontal lines based on slope threshold
-            if abs(slope) < 0.5:  # Adjust this threshold to ignore lines that are too horizontal
-                continue  # This excludes nearly horizontal lines
+            slope = (y2 - y1) / (x2 - x1 + 1e-6)
+            if abs(slope) < 0.5:  # Skip horizontal lines
+                continue
             if slope < 0:
                 left_lines.append((slope, y1 - slope * x1))
             else:
                 right_lines.append((slope, y1 - slope * x1))
 
+    # Create a transparent overlay
+    overlay = img.copy()
+    alpha = 0.4  # Transparency factor
+
     if left_lines:
         left_avg = np.average(left_lines, axis=0)
         x1, y1, x2, y2 = calculate_coordinates(img.shape, left_avg, vertices)
-        cv2.line(img, (x1, y1), (x2, y2), (255, 0, 0), 10)
+        cv2.line(overlay, (x1, y1), (x2, y2), (255, 0, 0), 15)  # Draw blue line on overlay
 
     if right_lines:
         right_avg = np.average(right_lines, axis=0)
         x1, y1, x2, y2 = calculate_coordinates(img.shape, right_avg, vertices)
-        cv2.line(img, (x1, y1), (x2, y2), (255, 0, 0), 10)
+        cv2.line(overlay, (x1, y1), (x2, y2), (255, 0, 0), 15)  # Draw blue line on overlay
+
+    # Blend the overlay with the original image
+    cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0, img)
 
     return img
+
 
 
 def calculate_coordinates(shape, line_parameters, vertices):
