@@ -2,12 +2,13 @@ import numpy as np
 import cv2
 
 # Global variables for lane lines smoothing
-previous_left_line = None
-previous_right_line = None
-smoothing_factor = 0.3  # Adjust this value for the amount of smoothing desired
+previous_left_lines = []
+previous_right_lines = []
+buffer_size = 5  # Number of frames to buffer
+smoothing_factor = 0.5  # Adjust this value for the amount of smoothing desired
 
 def process(image):
-    global previous_left_line, previous_right_line
+    global previous_left_lines, previous_right_lines
 
     image_g = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     threshold_low = 80
@@ -35,7 +36,7 @@ def region_of_interest(img, vertices):
     return masked_image
 
 def draw_the_lines(img, lines, vertices):
-    global previous_left_line, previous_right_line
+    global previous_left_lines, previous_right_lines
 
     left_lines = []
     right_lines = []
@@ -51,39 +52,43 @@ def draw_the_lines(img, lines, vertices):
 
     overlay = img.copy()
     alpha = 0.4  # Transparency factor
-    line_drawn = 0  # To track if any line is drawn
+    lines_drawn = 0
 
-    # Smooth the detected left and right lines using a simple moving average
+    # Smooth the detected left and right lines using a buffer of previous frames
     if left_lines:
         left_avg = np.average(left_lines, axis=0)
-        if previous_left_line is not None:
-            left_avg = smoothing_factor * left_avg + (1 - smoothing_factor) * previous_left_line
-        previous_left_line = left_avg
+        previous_left_lines.append(left_avg)
+        if len(previous_left_lines) > buffer_size:
+            previous_left_lines = previous_left_lines[-buffer_size:]
+        left_avg = np.mean(previous_left_lines, axis=0)
 
         x1, y1, x2, y2 = calculate_coordinates(img.shape, left_avg, vertices)
         cv2.line(overlay, (x1, y1), (x2, y2), (255, 0, 0), 15)
-        line_drawn += 1
+        lines_drawn += 1
 
     if right_lines:
         right_avg = np.average(right_lines, axis=0)
-        if previous_right_line is not None:
-            right_avg = smoothing_factor * right_avg + (1 - smoothing_factor) * previous_right_line
-        previous_right_line = right_avg
+        previous_right_lines.append(right_avg)
+        if len(previous_right_lines) > buffer_size:
+            previous_right_lines = previous_right_lines[-buffer_size:]
+        right_avg = np.mean(previous_right_lines, axis=0)
 
         x1, y1, x2, y2 = calculate_coordinates(img.shape, right_avg, vertices)
         cv2.line(overlay, (x1, y1), (x2, y2), (255, 0, 0), 15)
-        line_drawn += 1
+        lines_drawn += 1
 
     cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0, img)
 
-    # Add "Changing Route" text if only one line is detected
-    if line_drawn == 1:
+    # Add "Changing Route" text if only one line is detected    
+    if lines_drawn == 1:
         font = cv2.FONT_HERSHEY_SIMPLEX
         text = "Changing Route >>"
         textsize = cv2.getTextSize(text, font, 1, 2)[0]
         textX = (img.shape[1] - textsize[0]) / 2
         textY = (img.shape[0] + textsize[1]) / 2
         cv2.putText(img, text, (int(textX), int(textY)), font, 1, (0, 255, 255), 2, cv2.LINE_AA)
+        previous_left_lines.clear()
+        previous_right_lines.clear()
 
     return img
 
@@ -107,8 +112,8 @@ result = cv2.VideoWriter('./result.mp4',
 while cap.isOpened():
     ret, frame = cap.read()
     if ret:
-        frame_with_roi = process(frame)
-        result.write(frame_with_roi)
+        frame_with_lane = process(frame)
+        result.write(frame_with_lane)
     else:
         break
 
