@@ -45,7 +45,7 @@ Differentiate crosswalks from other road markings for safety.
 
 ### Crosswalk Detection Result
 <a href="https://imgbb.com/"><img src="https://i.ibb.co/rk8XxTd/crosswalk-result-ezgif-com-video-to-gif-converter.gif" alt="crosswalk-result-ezgif-com-video-to-gif-converter" border="0"></a>
-
+https://i.ibb.co/rk8XxTd/crosswalk-result-ezgif-com-video-to-gif-converter.gif
 ## Python Code Overview
 
 ### Day and Night Algorithm
