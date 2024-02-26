@@ -36,15 +36,14 @@ Differentiate crosswalks from other road markings for safety.
 ## Results
 
 ### Crosswalk Detection Result
-![Crosswalk Detection Result](https://i.ibb.co/rk8XxTd/crosswalk-result-ezgif-com-video-to-gif-converter.gif)
+![Crosswalk Detection Result](https://s6.ezgif.com/tmp/ezgif-6-5a9bb93d3f.gif)
 
 ### Day and Changing Road Result
-![Day and Changing Road Result](https://i.ibb.co/XxBCy0D/day-result-ezgif-com-video-to-gif-converter.gif)
+![Day and Changing Road Result](https://s6.ezgif.com/tmp/ezgif-6-3ae73fc256.gif)
 
 ### Night-Time Lane Detection Result
-![Night-Time Lane Detection Result](https://i.ibb.co/WGpD0jg/night-result-ezgif-com-video-to-gif-converter.gif)
+![Night-Time Lane Detection Result](https://s6.ezgif.com/tmp/ezgif-6-2f3c82a481.gif)
 
----
 
 ## Python Code Overview
 
