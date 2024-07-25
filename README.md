@@ -38,6 +38,13 @@ Differentiate crosswalks from other road markings for safety.
 ### Day Result
 
 
+<a href="https://www.youtube.com/embed/aVcRgJhPpVo?si=OBlkvJ-054Qv1GUr">
+  <img src="https://img.youtube.com/vi/aVcRgJhPpVo/maxresdefault.jpg" alt="Watch the Video" width="600" height="400">
+</a>
+
+### [Watch the Video Here](https://www.youtube.com/embed/aVcRgJhPpVo?si=OBlkvJ-054Qv1GUr)
+
+
 ### Night-Time Lane Detection Result
 
 
@@ -50,6 +57,13 @@ Differentiate crosswalks from other road markings for safety.
 
 
 ### Crosswalk Detection Result
+
+
+<a href="https://www.youtube.com/embed/pUXdubbXLzc?si=BMTVP0C6eUFqbnXu">
+  <img src="https://img.youtube.com/vi/pUXdubbXLzc/maxresdefault.jpg" alt="Watch the Video" width="600" height="400">
+</a>
+
+### [Watch the Video Here](https://www.youtube.com/embed/pUXdubbXLzc?si=BMTVP0C6eUFqbnXu)
 
 
 ## Python Code Overview
