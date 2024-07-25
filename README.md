@@ -35,15 +35,23 @@ Differentiate crosswalks from other road markings for safety.
 
 ## Results
 
-
-
 ### Day Result
-https://drive.google.com/file/d/1XmTtlc9z_W5AmOKVsSNyUQeJPg3Zqh9J/view?usp=sharing
+
+
 ### Night-Time Lane Detection Result
-![Night-Time Lane Detection Result](https://s6.ezgif.com/tmp/ezgif-6-2f3c82a481.gif)
+
+
+
+<a href="https://www.youtube.com/watch?time_continue=4&v=3EkIE4HaWGg&source_ve_path=MTM5MTE3LDI4NjYzLDEzOTExNywyMzg1MQ">
+  <img src="https://img.youtube.com/vi/3EkIE4HaWGg/maxresdefault.jpg" alt="Watch the Video" width="600" height="400">
+</a>
+
+### [Watch the Video Here](https://www.youtube.com/watch?time_continue=4&v=3EkIE4HaWGg&source_ve_path=MTM5MTE3LDI4NjYzLDEzOTExNywyMzg1MQ)
+
 
 ### Crosswalk Detection Result
-<iframe width="560" height="315" src="https://www.youtube.com/embed/pUXdubbXLzc?si=4nmi3cVjFLzb3V2Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+
 ## Python Code Overview
 
 ### Day and Night Algorithm
