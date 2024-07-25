@@ -33,6 +33,11 @@ Enhance the lane detection system with crosswalk detection capability.
 Implement algorithms to recognize crosswalk patterns and lines.
 Differentiate crosswalks from other road markings for safety.
 
+## The Architecture of the Algorithm: Step-by-Step Process
+
+![דגשגשג](https://github.com/user-attachments/assets/78df63a7-db15-45f2-aa6e-7d5a922c7962)
+
+
 ## Results
 
 ### Day Result
