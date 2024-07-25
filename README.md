@@ -42,11 +42,11 @@ Differentiate crosswalks from other road markings for safety.
 
 
 
-<a href="https://www.youtube.com/watch?time_continue=4&v=3EkIE4HaWGg&source_ve_path=MTM5MTE3LDI4NjYzLDEzOTExNywyMzg1MQ">
-  <img src="https://img.youtube.com/vi/3EkIE4HaWGg/maxresdefault.jpg" alt="Watch the Video" width="600" height="400">
+<a href="https://www.youtube.com/embed/rlmJ9cQNHYw?si=WkvmkkUjClX2JpNZ">
+  <img src="https://img.youtube.com/vi/rlmJ9cQNHYw/maxresdefault.jpg" alt="Watch the Video" width="600" height="400">
 </a>
 
-### [Watch the Video Here](https://www.youtube.com/watch?time_continue=4&v=3EkIE4HaWGg&source_ve_path=MTM5MTE3LDI4NjYzLDEzOTExNywyMzg1MQ)
+### [Watch the Video Here](https://www.youtube.com/embed/rlmJ9cQNHYw?si=WkvmkkUjClX2JpNZ)
 
 
 ### Crosswalk Detection Result
